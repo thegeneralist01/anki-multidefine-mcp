@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "anki-multidefine-mcp"
+version = "0.1.0"
+description = "MCP server exposing MultiDefine's monolingual dictionary providers"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "mcp[cli]>=2,<3",
+  "requests>=2",
+  "beautifulsoup4>=4",
+  "nltk>=3",
+]
+
+[project.scripts]
+anki-multidefine-mcp = "anki_multidefine_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/anki_multidefine_mcp"]
