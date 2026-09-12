@@ -6,7 +6,7 @@ Tell Claude to add a word to Anki. It looks it up in a real monolingual dictiona
 "Add a card for 'Schadenfreude' to my German deck."
 ```
 
-Works for English, German, Russian, French, and Azerbaijani. Definitions come from Oxford, DWDS, Wiktionary, and Larousse — the same sources the [MultiDefine Anki add-on](https://github.com/thegeneralist01/anki-multi-language-auto-define) uses.
+Works for English, German, Russian, French, and Azerbaijani. Definitions come from Oxford, DWDS, Wiktionary, and Larousse — the same sources the [MultiDefine Anki add-on](https://github.com/thegeneralist01/anki-multidefine) uses.
 
 ---
 
@@ -16,7 +16,7 @@ Works for English, German, Russian, French, and Azerbaijani. Definitions come fr
 |---|---|
 | [Anki](https://apps.ankiweb.net) desktop app | Free, runs locally |
 | [AnkiConnect](https://ankiweb.net/shared/info/2055492827) add-on | Lets Claude talk to Anki |
-| [MultiDefine](https://github.com/thegeneralist01/anki-multi-language-auto-define) add-on | Provides the note types Claude writes to |
+| [MultiDefine](https://github.com/thegeneralist01/anki-multidefine) add-on | Provides the note types Claude writes to |
 | [uv](https://docs.astral.sh/uv/getting-started/installation/) | Runs this server — no separate install step needed |
 | [Claude Desktop](https://claude.ai/download) | The AI client |
 
@@ -43,7 +43,7 @@ Open Anki → **Tools → Add-ons → Get Add-ons** and enter:
 
 That installs AnkiConnect. Then install MultiDefine:
 
-1. Download **[multidefine.ankiaddon](https://github.com/thegeneralist01/anki-multi-language-auto-define/releases/latest/download/multidefine.ankiaddon)**
+1. Download **[multidefine.ankiaddon](https://github.com/thegeneralist01/anki-multidefine/releases/latest/download/multidefine.ankiaddon)**
 2. In Anki: **Tools → Add-ons → Install from file** → select the downloaded file
 
 Restart Anki after both are installed.
