@@ -1,0 +1,51 @@
+{
+  "manifest_version": "0.4",
+  "name": "anki-multidefine-mcp",
+  "display_name": "MultiDefine for Anki",
+  "version": "0.1.0",
+  "description": "Look up words in monolingual dictionaries (Oxford, DWDS, Wiktionary, Larousse) and add them to Anki as flashcards.",
+  "long_description": "MultiDefine for Anki connects Claude to five monolingual dictionaries. Ask Claude to add a word to your Anki deck and it looks up the definition, downloads audio, formats the card, and creates the note — all in one message.\n\nSupports English (Oxford Learner's), German (DWDS), Russian (ru.Wiktionary), French (Larousse), and Azerbaijani (AZLEKS).\n\nRequires the AnkiConnect Anki add-on (code 2055492827) and the MultiDefine Anki add-on to be installed, and the Anki MCP server to also be configured in Claude Desktop.",
+  "author": {
+    "name": "thegeneralist01",
+    "url": "https://github.com/thegeneralist01"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thegeneralist01/anki-multidefine-mcp.git"
+  },
+  "homepage": "https://github.com/thegeneralist01/anki-multidefine-mcp",
+  "documentation": "https://github.com/thegeneralist01/anki-multidefine-mcp#readme",
+  "support": "https://github.com/thegeneralist01/anki-multidefine-mcp/issues",
+  "server": {
+    "type": "uv",
+    "entry_point": "src/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--with", "anki-multidefine-mcp", "--directory", "${__dirname}", "src/server.py"]
+    }
+  },
+  "tools": [
+    {
+      "name": "define",
+      "description": "Look up a word in a monolingual dictionary. Returns definitions, IPA, audio URL, and verb forms."
+    },
+    {
+      "name": "languages",
+      "description": "List supported language keys and their capabilities (audio, IPA, verb forms)."
+    }
+  ],
+  "tools_generated": false,
+  "keywords": ["anki", "dictionary", "flashcards", "language-learning", "oxford", "dwds", "wiktionary"],
+  "license": "GPL-2.0",
+  "privacy_policies": [
+    "https://www.oxfordlearnersdictionaries.com/privacy",
+    "https://www.dwds.de/d/datenschutz",
+    "https://foundation.wikimedia.org/wiki/Privacy_policy"
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "linux", "win32"],
+    "runtimes": {
+      "python": ">=3.10"
+    }
+  }
+}

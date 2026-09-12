@@ -24,6 +24,18 @@ Works for English, German, Russian, French, and Azerbaijani. Definitions come fr
 
 ## Setup
 
+### Quickest path — drag and drop (Claude Desktop on macOS/Windows)
+
+1. Download **[anki-multidefine-mcp.mcpb](https://github.com/thegeneralist01/anki-multidefine-mcp/releases/latest/download/anki-multidefine-mcp.mcpb)**
+2. Open Claude Desktop → **Settings → Extensions** → drag the file in (or use **Install Extension** and select it)
+3. Claude Desktop installs the server automatically
+
+You still need to install the Anki add-ons (Step 2 below) and the [Anki MCP server](#step-3--configure-the-anki-mcp-server).
+
+---
+
+### Manual setup (all platforms / other MCP clients)
+
 ### Step 1 — Install uv
 
 ```bash
