@@ -52,10 +52,19 @@ _SCHEMA = """\
 
 Read this before adding MultiDefine cards via anki-mcp-server.
 
-## Note type
-Use: MultiDefine_{Language}  e.g. MultiDefine_German, MultiDefine_Russian
-These types are created automatically when the MultiDefine Anki add-on is installed.
-If the add-on is not installed, create a note type with the 6 fields below in order.
+## CRITICAL: Note type
+
+ALWAYS use: MultiDefine_{Language}
+  - MultiDefine_English
+  - MultiDefine_German
+  - MultiDefine_Russian
+  - MultiDefine_French
+  - MultiDefine_Azerbaijani
+
+NEVER use Basic, Basic (and reversed card), Cloze, or any other note type.
+The MultiDefine note types are created automatically when the MultiDefine Anki
+add-on is installed. If modelNames() does not list them, tell the user to install
+the add-on before proceeding.
 
 ## Field mapping (0-indexed)
 
@@ -64,32 +73,32 @@ If the add-on is not installed, create a note type with the 6 fields below in or
 | 0 | Word                  | entries[0].name  (the resolved headword) |
 | 1 | DefinitionAndExamples | Formatted HTML — see format rules below |
 | 2 | Audio                 | [sound:{filename}] — see audio rules below |
-| 3 | Phonetics             | [ipa_text] — from pronunciations[0].ipa, or empty |
-| 4 | VerbForms             | space-joined verb_forms_list, or empty |
-| 5 | Image                 | leave empty unless user provides one |
+| 3 | Phonetics             | pronunciations[0].ipa verbatim, or empty string |
+| 4 | VerbForms             | space-joined verb_forms_list, or empty string |
+| 5 | Image                 | empty string unless user provides one |
 
 ## DefinitionAndExamples format rules
 For each entry in word_info.entries (multiple = different parts of speech):
   - If entry.wordform is set: render as <i>{wordform}</i>
-  - For each definition (up to max_definitions, default 3):
+  - For each definition group, for each definition (up to 3):
       <div><b>{description}</b></div>
-      <ul><li>{example}</li>...</ul>   (up to max_examples, default 2)
-  - Separate entries with <hr/>
-Cloze: wrap the headword token in examples as #word# so the card template
-blanks it on the reverse side. The template renders #word# → blank on back,
-#word# → bold on front answer.
+      <ul><li>{example}</li>...</ul>   (up to 2 examples; omit <ul> if none)
+  - Separate multiple entries with <hr/>
+Cloze: replace the headword token inside description/examples with #word# so the
+card template blanks it on the reverse side.
 
 ## Audio rules
 1. Check entries[].pronunciations[] for a non-null mp3 or ogg URL.
-2. Call anki-mcp-server's storeMediaFile tool to download the audio into
+2. Call anki-mcp-server's storeMediaFile tool to download the URL into
    Anki's media collection. Use the URL's last path segment (URL-decoded) as
    the filename.
-3. Reference as [sound:{filename}] in the Audio field.
-4. If no audio URL exists: leave Audio field empty (do not write "No audio").
+3. Set the Audio field to [sound:{filename}].
+4. If no audio URL exists: set Audio field to empty string "".
+   NEVER write "No audio", "No audio found", or any placeholder text.
 
 ## Workflow rules
-- Before adding: call anki-mcp-server findNotes to check for existing cards
-  with the same word in the same deck to avoid duplicates.
+- Before adding: call findNotes to check for existing cards with the same word
+  in the same deck to avoid duplicates.
 - If define() returns {"found": false}: tell the user; do not create a note.
 - Multiple entries in one define() result (noun + verb etc.): merge into one
   note, concatenated in DefinitionAndExamples with <hr/> between them.
