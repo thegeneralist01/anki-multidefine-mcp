@@ -34,7 +34,36 @@ def define(word: str, language: str) -> dict:
     results = provider.get_words_info(word)
     if not results:
         return {"found": False, "word": word, "language": language}
-    return {"found": True, "word": word, "language": language, "entries": results}
+    model_name = f"MultiDefine_{language.capitalize()}"
+    return {
+        "found": True,
+        "word": word,
+        "language": language,
+        "entries": results,
+        "_schema": {
+            "model_name": model_name,
+            "fields": {
+                "Word": "entries[0].name",
+                "DefinitionAndExamples": (
+                    f"<i>wordform</i> if set, then <div><b>description</b></div> per definition "
+                    f"(up to 3); <ul><li>example</li></ul> if examples list is non-empty (up to 2); "
+                    f"replace '{word}' token with #{word}# for cloze; separate multiple entries with <hr/>"
+                ),
+                "Audio": (
+                    "download mp3 or ogg URL via storeMediaFile and write [sound:filename] — "
+                    "if no URL exists write empty string, NEVER write placeholder text"
+                ),
+                "Phonetics": "pronunciations[0].ipa verbatim — empty string if none",
+                "VerbForms": "space-joined verb_forms_list — empty string if none",
+                "Image": "",
+            },
+            "rules": [
+                f"Use modelName '{model_name}' — NEVER Basic or any other note type",
+                "Call findNotes before addNote to avoid duplicates",
+                "If define() returned found=false do not create a note",
+            ],
+        },
+    }
 
 
 @mcp.tool()
