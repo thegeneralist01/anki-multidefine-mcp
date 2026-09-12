@@ -7,8 +7,11 @@ This file is part of anki-multidefine-mcp and is licensed under the GNU General 
 anki-multidefine-mcp is a pip-installable MCP server exposing MultiDefine dictionary providers as MCP tools. Providers return dictionary data; a separate Anki MCP server creates notes and stores media.
 
 ## Repository layout
-
 ```text
+bundle/
+  manifest.json              .mcpb bundle manifest (source of truth for release metadata)
+  pyproject.toml             declares anki-multidefine-mcp as a uv dependency
+  src/server.py              two-line shim — imports and runs anki_multidefine_mcp.server.main
 src/anki_multidefine_mcp/
   server.py                  MCP server, tools, resources, and stdio entry point
   providers/
@@ -22,7 +25,6 @@ src/anki_multidefine_mcp/
     french_larousse.py       Larousse provider
     azerbaijani_azleks.py    AZLEKS provider
 ```
-
 ## Hard rules
 
 1. `providers/oxford.py` is upstream BSD 3-Clause code by Near Huscarl. Do not modify it.
@@ -97,3 +99,26 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
 ## MCP SDK
 
 The required SDK is `mcp[cli]>=2,<3`. Use `MCPServer` from `mcp.server`; decorate tools with `@mcp.tool()` and resources with `@mcp.resource(uri)`; call `mcp.run()` to serve stdio.
+
+## Release process
+
+Bump `version` in `pyproject.toml`, `bundle/manifest.json`, and the `dependencies` pin in `bundle/pyproject.toml` in lockstep. Then:
+
+```bash
+# 1. Build and upload to PyPI
+python -m build
+TWINE_USERNAME=__token__ TWINE_PASSWORD=<pypi-token> .venv/bin/twine upload dist/*
+
+# 2. Build the .mcpb bundle (output goes to repo root — do NOT commit it)
+npx @anthropic-ai/mcpb pack bundle anki-multidefine-mcp.mcpb
+
+# 3. Create GitHub release and attach the .mcpb
+gh release create vX.Y.Z anki-multidefine-mcp.mcpb \
+  --title "vX.Y.Z" \
+  --notes "..."
+
+# 4. Clean up the local artifact
+rm anki-multidefine-mcp.mcpb
+```
+
+`*.mcpb` is in `.gitignore`. Never commit the built bundle — it belongs only in GitHub Releases.
