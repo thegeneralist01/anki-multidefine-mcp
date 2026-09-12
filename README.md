@@ -6,49 +6,63 @@ Tell Claude to add a word to Anki. It looks it up in a real monolingual dictiona
 "Add a card for 'Schadenfreude' to my German deck."
 ```
 
-Works for English, German, Russian, French, and Azerbaijani. Definitions come from Oxford, DWDS, Wiktionary, and Larousse — the same sources the [MultiDefine Anki add-on](https://github.com/thegeneralist01/anki-multidefine) uses.
+Works for English, German, Russian, French, and Azerbaijani. Definitions come from Oxford, DWDS, Wiktionary, and Larousse — the same sources the [MultiDefine Anki add-on](https://github.com/thegeneralist01/anki-multi-language-auto-define) uses.
 
 ---
 
 ## What you need before starting
 
-| Requirement | How to get it |
+| Requirement | Notes |
 |---|---|
-| [Anki](https://apps.ankiweb.net) desktop app | Download from ankiweb.net |
-| [AnkiConnect](https://ankiweb.net/shared/info/2055492827) Anki add-on | Install code `2055492827` in Anki |
-| [MultiDefine](https://github.com/thegeneralist01/anki-multidefine) Anki add-on | Provides the note types Claude writes to |
-| [Node.js](https://nodejs.org) 22+ | For the Anki MCP server |
-| Python 3.10+ | For this package |
+| [Anki](https://apps.ankiweb.net) desktop app | Free, runs locally |
+| [AnkiConnect](https://ankiweb.net/shared/info/2055492827) add-on | Lets Claude talk to Anki |
+| [MultiDefine](https://github.com/thegeneralist01/anki-multi-language-auto-define) add-on | Provides the note types Claude writes to |
+| [uv](https://docs.astral.sh/uv/getting-started/installation/) | Runs this server — no separate install step needed |
 | [Claude Desktop](https://claude.ai/download) | The AI client |
 
 ---
 
 ## Setup
 
-### Step 1 — Install the Anki add-ons
-
-Open Anki → Tools → Add-ons → Get Add-ons and install both codes:
-
-- `2055492827` — AnkiConnect (lets Claude talk to Anki)
-- `(MultiDefine code from the repo above)` — creates the note types
-
-Restart Anki after installing.
-
-### Step 2 — Install this package
+### Step 1 — Install uv
 
 ```bash
-pip install anki-multidefine-mcp
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+
+Or via Homebrew: `brew install uv`
+
+### Step 2 — Install the Anki add-ons
+
+Open Anki → **Tools → Add-ons → Get Add-ons** and enter:
+
+```
+2055492827
+```
+
+That installs AnkiConnect. Then install MultiDefine:
+
+1. Download **[multidefine.ankiaddon](https://github.com/thegeneralist01/anki-multi-language-auto-define/releases/latest/download/multidefine.ankiaddon)**
+2. In Anki: **Tools → Add-ons → Install from file** → select the downloaded file
+
+Restart Anki after both are installed.
 
 ### Step 3 — Configure Claude Desktop
 
-Open (or create) `~/Library/Application Support/Claude/claude_desktop_config.json` and paste:
+Open (or create) this file:
+
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+Paste the following (merge with any existing `mcpServers` block if you have one):
 
 ```json
 {
   "mcpServers": {
     "anki-multidefine": {
-      "command": "anki-multidefine-mcp"
+      "command": "uvx",
+      "args": ["anki-multidefine-mcp"]
     },
     "anki-mcp": {
       "command": "npx",
@@ -61,9 +75,9 @@ Open (or create) `~/Library/Application Support/Claude/claude_desktop_config.jso
 }
 ```
 
-### Step 4 — Restart Claude Desktop and Anki
+### Step 4 — Restart Claude Desktop
 
-Make sure Anki is open (AnkiConnect only responds while Anki is running).
+Keep Anki open — AnkiConnect only responds while Anki is running.
 
 ---
 
@@ -95,7 +109,7 @@ When you ask Claude to add a word, it:
 
 1. Calls `define(word, language)` — looks up the word in the monolingual dictionary
 2. Reads `multidefine://schema` — knows exactly which Anki fields to fill and how
-3. Calls anki-mcp-server's `findNotes` — skips the card if it already exists
+3. Calls `findNotes` — skips the card if it already exists in the deck
 4. Calls `storeMediaFile` with the audio URL — downloads pronunciation into Anki's media folder
 5. Calls `addNote` with the `MultiDefine_{Language}` note type — card appears in your deck
 
@@ -113,17 +127,21 @@ No UI to learn. No form to fill. Just describe what you want.
 | `french` | Larousse | Yes | — | — |
 | `azerbaijani` | AZLEKS | — | — | — |
 
+Claude infers the language from context — you rarely need to specify the key explicitly.
+
 ---
 
 ## Troubleshooting
 
-**"Cannot connect to Anki"** — Anki must be open and AnkiConnect installed. Visit `http://localhost:8765` in your browser; you should see `AnkiConnect`.
+**Claude says it can't connect to Anki** — Anki must be open and AnkiConnect installed. Verify by visiting `http://localhost:8765` in your browser; you should see a plain-text `AnkiConnect` response.
 
-**"Note type not found"** — The MultiDefine Anki add-on must be installed so the `MultiDefine_German` (etc.) note types exist. Open Anki → Tools → Manage Note Types to confirm.
+**"Note type not found"** — MultiDefine must be installed in Anki so the `MultiDefine_German` (etc.) note types exist. Check via **Tools → Manage Note Types**.
 
-**"Word not found"** — The word isn't in that dictionary. Try a different language key or check spelling.
+**"Word not found"** — The word isn't in that dictionary. Try a different spelling or language.
 
-**Card already exists** — Claude will tell you and skip creation. Ask it to update the existing card if you want.
+**Duplicate card** — Claude checks first and tells you if the card already exists. Ask it to update the existing note if you want.
+
+**`uvx` not found** — Claude Desktop may not inherit your shell PATH. Use the full path: run `which uvx` in your terminal, then replace `"uvx"` in the config with that path (e.g. `/Users/you/.local/bin/uvx`).
 
 ---
 
@@ -134,7 +152,7 @@ No UI to learn. No form to fill. Just describe what you want.
 | `define(word, language)` | Look up a word. Returns definitions, IPA, audio URL, verb forms. |
 | `languages()` | List supported language keys and their capabilities. |
 
-**Resource:** `multidefine://schema` — field mapping and workflow rules Claude reads before creating notes.
+**Resource:** `multidefine://schema` — field mapping and workflow rules Claude reads automatically before creating notes.
 
 ---
 
